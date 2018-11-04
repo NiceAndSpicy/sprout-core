@@ -1,0 +1,54 @@
+service: sprout-core
+
+custom:
+  tableName: 'farmers-table-${self:provider.stage}'
+  dynamodb:
+    start:
+      migrate: true
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+  region: ap-southeast-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["FarmersDynamoDBTable", "Arn"] }
+  environment:
+    FARMERS_TABLE: ${self:custom.tableName}
+
+functions:
+  rest-api:
+    handler: index.handler
+    events:
+      - http: 'ANY {proxy+}'
+
+resources:
+  Resources:
+    FarmersDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: farmerId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: farmerId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName}
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
