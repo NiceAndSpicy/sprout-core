@@ -64,6 +64,7 @@ resources:
 package:
   exclude:
     - inputs/**
+    - .git/**
 
 plugins:
   - serverless-dynamodb-local
