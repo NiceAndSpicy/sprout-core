@@ -30,6 +30,18 @@ functions:
     handler: index.handler
     events:
       - http: 'ANY {proxy+}'
+  farmer-created:
+    handler: events.farmerCreatedHandler
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+              - FarmersDynamoDBTable
+              - StreamArn
+          batchSize: 1
+    environment:
+      SMS_URL: https://a268445f.ngrok.io
 
 resources:
   Resources:
@@ -48,6 +60,10 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:custom.tableName}
+
+package:
+  exclude:
+    - inputs/**
 
 plugins:
   - serverless-dynamodb-local
