@@ -45,6 +45,16 @@ functions:
           batchSize: 1
     environment:
       SMS_URL: https://a268445f.ngrok.io
+  farmer-subscribed:
+    handler: events.farmerSubscribedHander
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+              - FarmersDynamoDBTable
+              - StreamArn
+          batchSize: 1
 
 resources:
   Resources:
