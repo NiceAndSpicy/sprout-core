@@ -42,6 +42,35 @@ const events = {
     } catch (e) {
       cb(e)
     }
+  },
+  locationNewSubscriptionHandler: async function(event, context, cb) {
+    try {
+      const isExistingLocation = (record) => record.eventName === 'MODIFY'
+      const transform = ({ dynamodb }) => ({
+        barangay: dynamodb.NewImage.barangay.S,
+        municipality: dynamodb.NewImage.municipality.S,
+        province: dynamodb.NewImage.province.S,
+        newSubs: dynamodb.NewImage.subscribers.L.map(({ S }) => S),
+        oldSubs: dynamodb.OldImage.subscribers.L.map(({ S }) => S)
+      })
+      const updates = event.Records.filter(isExistingLocation).map(transform)
+      const promises = updates.map(async (location) => {
+        const { barangay, municipality, province } = location
+        const { newSubs, oldSubs } = location
+        const recentSubs = newSubs.filter(isRecentlySubbed(oldSubs))
+        const promises = recentSubs.map(async (phone) => {
+          const message = 'You have been subscribed to the weather updates ' +
+            `for ${barangay}, ${municipality}, ${province}. You will receive ` +
+            'the latest weather updates every 12 hours.'
+          await sms.send(phone, message)
+        })
+        await Promise.all(promises)
+      })
+      await Promise.all(promises)
+      cb()
+    } catch (e) {
+      cb(e)
+    }
   }
 }
 

@@ -1,0 +1,59 @@
+{
+  "Records": [{
+    "eventID": "1",
+    "eventName": "MODIFY",
+    "eventVersion": "1.0",
+    "eventSource": "aws:dynamodb",
+    "awsRegion": "us-southeast-1",
+    "dynamodb": {
+      "Keys": {
+        "locationId": {
+          "S": "d47ff5c2-d1d5-4903-bed0-20676977f54"
+        }
+      },
+      "NewImage": {
+        "barangay": {
+          "S": "Poblacion"
+        },
+        "municipality": {
+          "S": "Magsaysay"
+        },
+        "province": {
+          "S": "Occidental Mindoro"
+        },
+        "locationId": {
+          "S": "d47ff5c2-d1d5-4903-bed0-20676977f54"
+        },
+        "subscribers": {
+          "L": [
+            { "S": "1234567890" },
+            { "S": "09983309766" }
+          ]
+        }
+      },
+      "OldImage": {
+        "barangay": {
+          "S": "Poblacion"
+        },
+        "municipality": {
+          "S": "Magsaysay"
+        },
+        "province": {
+          "S": "Occidental Mindoro"
+        },
+        "locationId": {
+          "S": "d47ff5c2-d1d5-4903-bed0-20676977f54"
+        },
+        "subscribers": {
+          "L": [
+            { "S": "09983309766" }
+          ]
+        }
+      },
+      "SequenceNumber": "111",
+      "SizeBytes": 26,
+      "StreamViewType": "NEW_AND_OLD_IMAGES"
+    },
+    "eventSourceARN": "stream-ARN"
+  }]
+}
