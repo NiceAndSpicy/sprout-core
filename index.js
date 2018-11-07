@@ -14,7 +14,7 @@ app.get('/farmers/:farmerId', async (req, res) => {
     const farmer = await farmers.get(req.params.farmerId)
     res.status(200).json(farmer)
   } catch (e) {
-    const status = e.message === 'Farmer not found' ? 404 : 500
+    const status = isNotFound(e.message) ? 404 : 500
     res.status(status).json({ error: e.message })
   }
 })
@@ -33,7 +33,7 @@ app.get('/locations/:locationId', async (req, res) => {
     const location = await locations.get(req.params.locationId )
     res.status(200).json(location)
   } catch (e) {
-    const status = e.message === 'Location not found' ? 404 : 500
+    const status = isNotFound(e.message) ? 404 : 500
     res.status(status).json({ error: e.message })
   }
 })
@@ -46,5 +46,9 @@ app.post('/locations', async (req, res) => {
     res.status(500).json({ error: e.message })
   }
 })
+
+function isNotFound(message) {
+  return /not found/.test(message)
+}
 
 module.exports.handler = serverless(app)
