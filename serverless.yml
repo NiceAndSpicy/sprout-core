@@ -1,7 +1,8 @@
 service: sprout-core
 
 custom:
-  tableName: 'farmers-table-${self:provider.stage}'
+  farmersTable: 'farmers-table-${self:provider.stage}'
+  locationsTable: 'locations-table-${self:provider.stage}'
   dynamodb:
     start:
       migrate: true
@@ -22,8 +23,10 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - { "Fn::GetAtt": ["FarmersDynamoDBTable", "Arn"] }
+        - { "Fn::GetAtt": ["LocationsDynamoDBTable", "Arn"] }
   environment:
-    FARMERS_TABLE: ${self:custom.tableName}
+    FARMERS_TABLE: ${self:custom.farmersTable}
+    LOCATIONS_TABLE: ${self:custom.locationsTable}
 
 functions:
   rest-api:
@@ -59,7 +62,22 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:custom.tableName}
+        TableName: ${self:custom.farmersTable}
+    LocationsDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: locationId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: locationId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.locationsTable}
 
 package:
   exclude:
