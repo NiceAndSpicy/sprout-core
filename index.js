@@ -47,8 +47,27 @@ app.post('/locations', async (req, res) => {
   }
 })
 
+app.post('/farmers/:farmerId/subscribe', async (req, res) => {
+  try {
+    const farmer = await farmers.get(req.params.farmerId)
+    const locationIds = req.body.filter(isUnsubscribedFrom(farmer))
+    for(const locationId of locationIds) {
+      await locations.get(locationId)
+    }
+    const subscriptions = await farmers.addSubscriptions(farmer, locationIds)
+    res.status(200).json(subscriptions)
+  } catch (e) {
+    const status = isNotFound(e.message) ? 404 : 500
+    res.status(status).json({ error: e.message })
+  }
+})
+
 function isNotFound(message) {
   return /not found/.test(message)
+}
+
+function isUnsubscribedFrom({ subscriptions }) {
+  return (locationId) => !subscriptions.includes(locationId)
 }
 
 module.exports.handler = serverless(app)
